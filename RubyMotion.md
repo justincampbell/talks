@@ -38,6 +38,7 @@ bit.ly/dividata-ios-beta
 * Ruby compiler for iOS
 * Rake workflow
 * 1.9 (ish)
+* Core library
 * Missing require/eval
 * Named-parameters
 
