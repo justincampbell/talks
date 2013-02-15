@@ -1,10 +1,6 @@
 # RubyMotion
 
-@justincampbell
-
-# Dividata iOS
-
-bit.ly/dividata-ios-beta
+@justincampbell / mashion.net
 
 # iOS #1
 
@@ -15,7 +11,7 @@ bit.ly/dividata-ios-beta
 
 # iOS #2
 
-* Movitas
+* Consultant-built
 * Only Mac user in office
 * PhoneGap/SIP
 
@@ -29,8 +25,8 @@ bit.ly/dividata-ios-beta
 # RubyMotion
 
 * Laurent Sansonetti (@lrz)
+* MacRuby @ Apple
 * HipByte
-* MacRuby
 * $199
 
 # What is RubyMotion?
@@ -39,8 +35,8 @@ bit.ly/dividata-ios-beta
 * Rake workflow
 * 1.9 (ish)
 * Core library
-* Missing require/eval
-* Named-parameters
+* Missing require/eval/binding
+* Adds named-parameters
 
 # Named Parameters
 
@@ -60,15 +56,26 @@ NSString
 # Named Parameters
 
 ```rb
+class String
+  def compare(other, options: options)
+    ...
+  end
+end
+
 "Ruby".compare("ruby",
   options: NSCaseInsensitiveSearch)
 ```
 
 # Named Parameters
 
-```rb
-"Ruby".compare "ruby",
-  options: NSCaseInsensitiveSearch
+```objc
+- (BOOL)application:
+    (UIApplication *)application
+  didFinishLaunchingWithOptions:
+    (NSDictionary *)launchOptions
+{
+  return true;
+}
 ```
 
 # Named Parameters
@@ -76,7 +83,8 @@ NSString
 ```rb
 def application(application,
   didFinishLoadingWithOptions: options)
-  # ...
+
+  true
 end
 ```
 
@@ -109,27 +117,48 @@ pointer = Pointer.new :object
 
 ```rb
 Dispatch::Queue.concurrent.async do
+  @result = do_work
+
   Dispatch::Queue.main.sync do
-    puts "Hi!"
+    handle @result
   end
 end
 ```
 
-# Demo
+# New App
 
-New App
+```rb
+motion create my-app
+rake config
+rake
+```
 
-# Demo
+# Testflight
 
-Dividata + REPL
+```sh
+rake testflight notes="New stuff"
+```
 
-# Demo
+# Why?
 
-TestFlight
+* Ruby! ~3X more concise than Obj-C
+* Rake! We ❤ the command line
+* Vim/Emacs/Sublime/etc...
+* Amazing community
 
-#
+# Twitter Search
 
-Questions?
+justincampbell/rubymotion-demo
+
+# Cocos2D
+
+justincampbell/rubymotion-cocos2d
+
+# Dividata
+
+appstore.com/dividata
+
+# Questions?
 
 # Thanks!
 
