@@ -44,12 +44,12 @@ and also object-oriented design in general.
 I decided I wanted to learn new languages because I kept hearing and reading people talk about them.
 What they said seemed so different from what I was used to.
 Why is everyone talking about functional programming?
-How could Erlang possibly be more robust by letting things fail?
+How could Erlang and Elixir possibly be more robust by letting things fail?
 How could Haskell be pure with no side effects and do anything useful?
-Why would anyone ever use Go or Rust or even C? Ruby and Python seem fine for that stuff.
-People keep saying Ruby is slow, is that really true? It doesn't feel slow.
-Every day on Reddit, Twitter, and Lobste.rs there are hundreds of posts about languages and frameworks I've never used,
-And that's what got me interested to know what else was out there.
+Why would anyone ever use Go or Rust or even C? Ruby seems fine for that stuff.
+People keep saying Ruby is slow, is that really true? It doesn't feel *too* slow.
+Every day on Reddit, Twitter, and Lobste.rs there are hundreds of posts about languages and frameworks I've never used, and that's what got me interested:
+I wanted to know what else was out there; I wanted to learn.
 
 ---
 
@@ -58,7 +58,6 @@ And that's what got me interested to know what else was out there.
 ^
 So I installed some languages.
 I think the first one I played with was Clojure.
-It had a lot of hype around it at the time.
 I made a dice rolling API that returned JSON arrays of random numbers.
 
 ---
@@ -74,28 +73,20 @@ It was very reminiscent of installing Linux/BSD when I was younger.
 ![fit](http://www.absolutelinux.org/installing/images/lilo_sel_linux_partition.png)
 
 ^
-I would download an installation ISO, install it, and then... that was about it.
+I would download an ISO, install it, and then get bored and forget about it.
 I never had a use for Linux at the time, and I never had a goal of what I wanted to learn.
 I just compulsively installed it on a whim
-
----
-
-#[fit] You *need* a project
-
-^
-You need a project
 
 ---
 
 #[fit] I *need* a project
 
 ^
-Or at least, I realized I need a project
+I realized that I needed a project
 This may seems obvious to some people but it was a big deal for me:
-I needed a project.
-Or, more abstractly, I needed a goal.
+I needed a goal.
 What was I trying to accomplish?
-I thought about what came to mind when I thought of programming.
+So I thought about what came to mind when I thought of programming.
 
 ---
 
@@ -104,7 +95,7 @@ I thought about what came to mind when I thought of programming.
 ^
 Most projects I work on are on the internet.
 They're either a web site, or an API for some client.
-And behind those websites and APIs,
+And behind those websites and public APIs,
 there are other services being used over HTTP.
 So I think HTTP support is important to me when evaluating a language.
 
@@ -127,8 +118,10 @@ And if I'm writing to the server,
 it has to store the information I gave it somewhere.
 One thing I don't want to do is use an external database.
 Yes, I would probably use a database such as Postgres, Redis, et cetera in a real app,
-but that seems like a lot of work when doing language exploration.
-So let's try to keep the state of the world in memory somewhere,
+but if I'm trying to learn many languages,
+maintaining a SQL database would be a lot of work.
+Redis would be easier, but still is an external dependency.
+So I want to keep the state of the world in memory somewhere,
 and that also forces me to think about concurrency.
 
 ---
@@ -142,19 +135,11 @@ testing is very important to me
 ---
 
 #[fit] TDD
-![fit right](https://www.getdigital.eu/web/getdigital/gfx/products/__generated__resized/1100x1100/Aufkleber_Trollface.jpg)
 
 ^
-And that means TDD for me.
+And for me that means TDD.
 I'm most comfortable writing code when I have tests that cover it.
 Mostly because I'm lazy.
-
----
-
-#[fit] TDD
-![fit right](http://tdd.rip/images/tddface.png)
-
-^
 If I have to start up an application
 and manually make requests to it to make sure it functions correctly,
 that sounds like a lot of work.
@@ -199,16 +184,17 @@ The project I came up with is a URL shortener.
 It's an HTTP API that will return a "token" for a URL,
 and then if you request that path, it will redirect you to the URL.
 The tokens start at 1 and increment to keep things simple.
-but if I were really building a URL shortener, I might encode or randomize the tokens in some way
+but if I were really building a URL shortener,
+I might encode or deterministically randomize the tokens in some way.
 
 ---
 
 # Shorten
 
 ```
-POST / "url=http://justincampbell.me" -------> ,---------,
-                                               |Shortener|
-201 Created <--------------------------------- '---------'
+POST / "url=http://justincampbell.me" -------> ,--------,
+                                               | Server |
+201 Created <--------------------------------- '--------'
 /1
 ```
 
@@ -217,9 +203,9 @@ POST / "url=http://justincampbell.me" -------> ,---------,
 # Expand
 
 ```
-GET /1 --------------------------------------> ,---------,
-                                               |Shortener|
-301 Redirect <-------------------------------- '---------'
+GET /1 --------------------------------------> ,--------,
+                                               | Server |
+301 Redirect <-------------------------------- '--------'
 Location: http://justincampbell.me
 ```
 
@@ -228,14 +214,14 @@ Location: http://justincampbell.me
 # Missing
 
 ```
-GET /54321 ----------------------------------> ,---------,
-                                               |Shortener|
-404 Not Found <------------------------------- '---------'
+GET /54321 ----------------------------------> ,--------,
+                                               | Server |
+404 Not Found <------------------------------- '--------'
 ```
 
 ^
 So I'd like to touch on a few code samples of this in a few languages,
-and the things I learned from them.
+and the things that I learned from them.
 
 ---
 
@@ -351,10 +337,24 @@ so that every time we ask for the instance we get the same one back
 
 ---
 
-#[fit] Thread-Safe?
+```ruby
+class Shortener
+  def self.instance
+    @instance ||= new
+  end
+
+  def id_generator
+    @id_generator ||= (1..Float::INFINITY).enum_for
+  end
+
+  def urls
+    @urls ||= Hash.new
+  end
+end
+```
 
 ^
-Is that thread-safe?
+Is this code thread-safe?
 If I run this code in JRuby or Rubinius, will I get missing URLs or token collisions,
 because two things are trying to update these objects at the same time?
 Or if I use Puma or Unicorn?
@@ -366,7 +366,8 @@ TODO funny pic
 ![](https://cdn0.gamesports.net/storage/16000/16987.jpg)
 
 ^
-I have no idea
+I have absolutely no idea,
+but I know enough to be skeptical.
 
 ---
 
@@ -446,6 +447,7 @@ I love how little code there is to guarantee safe concurrent access to the token
 It's one function to wrap the value,
 and the `swap!` function is in place of whatever you would normally write there.
 So about 4-6 characters if you count parentheses.
+Is this code thread-safe? Yes.
 
 ---
 
@@ -591,12 +593,14 @@ In order to shorten a URL in a pure manner,
 type Token = String
 type Url = String
 
-shorten :: Url -> World -> Token
+shorten :: Url -> UrlStore -> Token
 ```
 
 ^
-we have to also pass in the state of the world.
-And then the output of our function, if it updates the world,
+we have to also pass in the state of the world:
+in this case I'm calling it `UrlShore`.
+And then the output of our function,
+if it updates the world,
 
 ---
 
@@ -605,12 +609,11 @@ And then the output of our function, if it updates the world,
 type Token = String
 type Url = String
 
-shorten :: Url -> World -> World
+shorten :: Url -> UrlStore -> UrlStore
 ```
 
 ^
 will also have to include the new state of the world,
-and we can use another function to get the last token from that.
 
 ---
 
@@ -619,14 +622,28 @@ and we can use another function to get the last token from that.
 type Token = String
 type Url = String
 
-data World = World { id :: Int,
-                     urls :: Map Token Url }
-
-shorten :: Url -> World -> World
+shorten :: Url -> UrlStore -> UrlStore
+lastToken :: UrlStore -> Token
 ```
 
 ^
-We make a new data type called "World",
+and then I can use another function to get the last token from the `UrlStore`.
+
+---
+
+```haskell
+{- Haskell -}
+type Token = String
+type Url = String
+
+data UrlStore = UrlStore { id :: Int,
+                           urls :: Map Token Url }
+
+shorten :: Url -> UrlStore -> UrlStore
+```
+
+^
+We make a new data type called "UrlStore",
 and it has an id, and a map (or hash) of tokens to urls.
 
 ---
@@ -636,20 +653,21 @@ and it has an id, and a map (or hash) of tokens to urls.
 type Token = String
 type Url = String
 
-data World = World { id :: Int,
-                     urls :: Map Token Url }
+data UrlStore = UrlStore { id :: Int,
+                           urls :: Map Token Url }
 
-shorten :: Url -> World -> World
-shorten url world = newWorld where
-        nextId = succ $ _id world
+shorten :: Url -> UrlStore -> UrlStore
+shorten url world = newUrlStore where
+        nextId = succ $ id world
         token = show nextId
-        newUrls = insert token url $ _urls world
-        newWorld = World nextId newUrls
+        newUrls = insert token url $ urls world
+        newUrlStore = UrlStore nextId newUrls
 ```
 
 ^
-And then we can write our function that only operates on the data that was passed into it,
-and only returns a new `World`,
+And then we can write our function,
+that only operates on the data that was passed into it,
+and only returns a new `UrlStore`,
 and doesn't affect anything outside of itself.
 
 ---
@@ -659,14 +677,14 @@ and doesn't affect anything outside of itself.
 type Token = String
 type Url = String
 
-data World = World { id :: Int,
-                     urls :: Map Token Url }
+data UrlStore = UrlStore { id :: Int,
+                           urls :: Map Token Url }
 
-shorten :: Url -> World -> World
+shorten :: Url -> UrlStore -> UrlStore
 ```
 
 ^
-So if we get rid of the implementation,
+And if we get rid of the implementation,
 
 ---
 
@@ -675,17 +693,19 @@ So if we get rid of the implementation,
 type Token = String
 type Url = String
 
-data World = World { id :: Int,
-                     urls :: Map Token Url }
+data UrlStore = UrlStore { id :: Int,
+                           urls :: Map Token Url }
 
-shorten :: Url -> World -> World
-expand :: Token -> World -> Maybe Url
+shorten :: Url -> UrlStore -> UrlStore
+expand :: Token -> UrlStore -> Maybe Url
 ```
 
 ^
 and add the type signature for an `expand` function,
-without even seeing the code for the functions, you can tell what they do.
-Not only can you tell, but the Haskell compiler *guarantees* it will do exactly what these types say.
+without even seeing the code for the functions,
+you can tell what they do.
+Not only can you tell,
+but the Haskell compiler *guarantees* it will do exactly what these types say.
 
 ---
 
@@ -726,7 +746,7 @@ but it uses global variables.
 
 ```haskell
 {- Haskell -}
-expand :: Token -> World -> Maybe Url
+expand :: Token -> UrlStore -> Maybe Url
 ```
 
 ```nimrod
@@ -809,8 +829,7 @@ NoMethodError: undefined method `name' for nil:NilClass
 ```
 
 ^
-By the way
-Every time we get a NoMethodError in Ruby,
+And I realized that every time I get a `NoMethodError` in Ruby,
 
 ---
 
@@ -886,20 +905,6 @@ http.Redirect(response, request, url, 301); // ???
 
 ^
 we don't know for sure what the result would be.
-
----
-
-> In two weeks, Im headed to India to give a keynote at a Go Conference. Last year this time, I was like, "why do I need a GOROOT and GOPATH?" - Bryan Lyles
-
-^
-I love this tweet because it shows how much progress you can make when learning something new.
-From someone,
-in this case an experienced programmer, but new to Go,
-to keynote speaker a year later.
-But, I also love that even Bryan Lyles was fighting the conventions of Go,
-because I felt like the only one that was confused by those environment variables
-and how my directories should be structured.
-TODO this should be moved
 
 ---
 
@@ -1041,17 +1046,49 @@ that this code doesn't work
 
 ---
 
+```ruby
+# Ruby
+def halve(number -> Num) -> Num
+  number / 2.0
+end
+```
+
 ^
 I think people assume adding time checking to Ruby would be limiting.
 But I wonder, if adding type inference to Ruby would allow us to evolve
-and create new conventions, and borrow more from other languages
+and create new conventions, and borrow more from other languages.
+
+---
+
+![fit](http://upload.wikimedia.org/wikipedia/commons/c/cf/Hott_book_cover.png)
+
+^
+In learning all of these languages,
+static typing hasn't been the biggest differentiator to me directly.
+Instead, it's really been how each handles errors,
+which can be related to static typing.
+
+---
+
+![fit](http://www.safetybanners.org/_images/Safety-is-everyones-responsibility.jpg)
+
+^
+It's really about confidence that my code works.
+And in Ruby, I *am* confident, because I know many of the edge cases,
+and it's very easy to test things.
+But as I said in one of the first examples,
+even *I* don't know what that code will do without trying it out in different environments.
+As an aside, one of my next projects is a tool
+that will try to find race conditions in these different implementations,
+as well as benchmarking them.
 
 ---
 
 ![fit](http://i1.kym-cdn.com/photos/images/facebook/000/234/765/b7e.jpg)
 
 ^
-This code I've written is probably not idiomatic for each language
+Stepping back for a minute:
+The code I've written is probably not idiomatic for each language.
 
 ---
 
@@ -1060,13 +1097,13 @@ This code I've written is probably not idiomatic for each language
 ^
 But I've really tried hard to embrace the conventions of the languages when I learn them.
 It's very easy to have a knee-jerk reaction when we see something we're not used to.
-Like, why does Go not have versioned dependencies? TODO
+Like, why does Go not have versioned dependencies?
 
 ---
 
 #[fit] Embrace
 #[fit] Conventions
-![fit right](http://i.imgur.com/GWY10z7.gif)
+![right](http://i.imgur.com/GWY10z7.gif)
 
 ^
 Embrace the conventions of the language you're working in.
@@ -1166,7 +1203,7 @@ and sometimes even suggests better code.
 ```
 
 ^
-Another tool I've grown to love is `make`.
+Another tool I've really grown to love is `make`.
 
 ---
 
@@ -1185,12 +1222,12 @@ test:
 
 ^
 Make runs commands and their dependencies.
-We typically use Rake in Ruby to do this.
+In Ruby, we typically use Rake for this.
 But when you're learning multiple languages,
 or returning to a language you haven't used in some time,
 or sharing a service you wrote at work with a coworker,
-it's hard to remember commands.
-Makefiles are executable documentation for what commands do what.
+it's really hard to remember which commands to run.
+Makefiles are executable documentation.
 
 ---
 
@@ -1245,7 +1282,9 @@ but in every other language I'm working in
 
 ---
 
-# Make you a better Rubyist
+#[fit] Make you
+#[fit] a better
+#[fit] *x* developer
 
 ^
 I believe it made me a better Rubyist
@@ -1300,9 +1339,10 @@ and fighting off boredom.
 #[fit] Ruby:
 
 ^
+So before I finish,
 I have some random ideas for Ruby
 that I didn't touch on earlier,
-in no particular order
+and in no particular order
 
 ---
 
@@ -1663,6 +1703,14 @@ but it's a great language for getting stuff done.
 
 ---
 
+#[fit] Ruby
+
+^
+And if you already know those languages,
+you should learn Ruby!
+
+---
+
 #[fit] Fun + Community
 
 ^
@@ -1693,6 +1741,8 @@ How hard is it to find help?
 When I go find help, am I welcomed or ridiculed for not getting it?
 Is there a vocal minority of people
 that make you embarrassed to be a part of that community?
+In a way, this matters more than any other aspect of a language,
+because it affects everyone who uses it.
 
 ---
 
@@ -1738,7 +1788,8 @@ This is great for code retreats too.
 ![left](http://i.imgur.com/NWq5WIq.gif)
 
 ^
-Share your excitement and passion with someone else
+I hope that everyone here will try to learn a new language soon,
+and when you do, share your excitement and passion with someone else
 
 ---
 

@@ -3,7 +3,9 @@
 My talks, in Markdown.  
 Presented with [tp](http://github.com/justincampbell/tp) or [Deckset](http://www.decksetapp.com)
 
-* [Make Up Your Own "Hello, World!"](https://github.com/justincampbell/talks/blob/master/make-up-your-own-hello-world.md) @ [MountainWest RubyConf 2015](http://mtnwestrubyconf.org/2015)
+* [Make Up Your Own "Hello, World!"](https://github.com/justincampbell/talks/blob/master/make-up-your-own-hello-world.md) @ [LambdaConf 2015](http://www.degoesconsulting.com/lambdaconf-2015)
+* [Make Up Your Own "Hello, World!"](https://github.com/justincampbell/talks/blob/f90b414/make-up-your-own-hello-world.md) @ [Philly.rb April 2015](http://www.meetup.com/Phillyrb/events/221187308/)
+* [Make Up Your Own "Hello, World!"](https://github.com/justincampbell/talks/blob/f90b414/make-up-your-own-hello-world.md) @ [MountainWest RubyConf 2015](http://mtnwestrubyconf.org/2015)
 * [5 Vim Misconceptions](https://github.com/justincampbell/talks/blob/master/vim-misconceptions.md) @ [Philly.rb February 2015](http://www.meetup.com/Phillyrb/events/220015413/)
 * [Drone CI](https://github.com/justincampbell/talks/blob/master/Drone.md) ([Video](https://vimeo.com/96136521)) @ [Philly DevOps May 2014](http://www.meetup.com/PhillyDevOps/events/181883832/)
 * [A Taste of Elixir](https://github.com/justincampbell/talks/blob/master/Elixir.md) ([Video](http://vimeo.com/74250955)) @ [Philly.rb August 2013](http://www.meetup.com/Phillyrb/events/131081902/)
